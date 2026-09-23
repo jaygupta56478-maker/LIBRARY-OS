@@ -30,6 +30,11 @@ const fallbackBooks: Book[] = fallbackSeed.map(([title, author, category, gutenb
   sourceUrl: `https://www.gutenberg.org/ebooks/${gutenbergId}`,
 }));
 
+// Set VITE_API_BASE_URL in a hosted environment, for example
+// https://library-os-api.example.com. Leave it empty for local Vite proxying.
+const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL ?? '').replace(/\/$/, '');
+const apiUrl = (path: string) => `${apiBaseUrl}${path}`;
+
 function paginate(text: string, maxChars = 2550) {
   const clean = text.replace(/\r/g, '').replace(/\n{3,}/g, '\n\n').trim();
   const paragraphs = clean.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
@@ -247,7 +252,7 @@ export default function LandingPage() {
   }, []);
 
   useEffect(() => {
-    fetch('/api/books')
+    fetch(apiUrl('/api/books'))
       .then((response) => { if (!response.ok) throw new Error('Backend offline'); return response.json(); })
       .then((data: Book[]) => { if (Array.isArray(data) && data.length) setBooks(data); setBackendOnline(true); })
       .catch(() => setBackendOnline(false));
@@ -268,7 +273,7 @@ export default function LandingPage() {
     setReader({ book, pages: [], page: 0, loading: true, opening: true });
     window.setTimeout(() => setReader((r) => r ? { ...r, opening: false } : r), reduceMotion ? 40 : 1100);
     try {
-      const response = await fetch(`/api/books/${book.id}/content`);
+      const response = await fetch(apiUrl(`/api/books/${book.id}/content`));
       if (!response.ok) {
         const body = await response.json().catch(() => ({ error: `Backend returned HTTP ${response.status}.` }));
         throw new Error(body.error || `Backend returned HTTP ${response.status}.`);

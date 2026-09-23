@@ -38,6 +38,18 @@ npm run dev
 
 The frontend development server proxies API requests to `http://localhost:8080`.
 
+## Deployment
+
+Import this repository into Vercel from the repository root. The included `vercel.json` builds the Vite frontend automatically.
+
+Deploy the C++ service separately as a Docker service using `backend/Dockerfile` (for example, on Render, Railway, or Fly.io). When it has a public URL, add this Vercel environment variable and redeploy:
+
+```text
+VITE_API_BASE_URL=https://your-hosted-library-os-api.example.com
+```
+
+The API enables browser access from the hosted frontend and uses the platform-provided `PORT` value.
+
 ## Project structure
 
 ```text

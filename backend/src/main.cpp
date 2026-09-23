@@ -7,6 +7,7 @@
 #include <memory>
 #include <string>
 #include <stdexcept>
+#include <cstdlib>
 
 
 int main() {
@@ -18,6 +19,10 @@ int main() {
 
     httplib::Server server;
     server.set_mount_point("/", "../frontend/dist");
+    server.set_default_headers({
+        {"Access-Control-Allow-Origin", "*"},
+        {"Access-Control-Allow-Methods", "GET, OPTIONS"}
+    });
 
     server.Get("/api/health", [](const httplib::Request&, httplib::Response& response) {
         response.set_content(R"({"status":"ok","engine":"Library OS C++ OOP Core","language":"C++17"})", "application/json");
@@ -53,7 +58,9 @@ int main() {
         }
     });
 
-    std::cout << "Library OS API: http://localhost:8080\n";
+    const char* portValue = std::getenv("PORT");
+    const int port = portValue ? std::stoi(portValue) : 8080;
+    std::cout << "Library OS API: http://localhost:" << port << "\n";
     std::cout << "GET /api/books and GET /api/books/{id}/content\n";
-    server.listen("0.0.0.0", 8080);
+    server.listen("0.0.0.0", port);
 }

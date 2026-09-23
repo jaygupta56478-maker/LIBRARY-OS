@@ -12,7 +12,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-ins
 
 WORKDIR /app
 COPY --from=build /app/build/bin/LibraryOS /app/LibraryOS
-COPY --from=build /app/data /app/data
+RUN mkdir -p /app/data/cache
 
 ENV PORT=8080
 EXPOSE 8080
